@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -14,35 +8,116 @@ datasource db {
 }
 
 model User {
-  id            String       @id 
-  createdAt     DateTime  @default(now())
-  email         String    @unique
+  id            String   @id
+  email         String   @unique
   name          String?
-  role          Role      @default(USER)
-  posts         Post[]
-  emailVerified Boolean   @default(false)
   image         String?
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  emailVerified Boolean  @default(false)
+  isAdmin       Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientProfile    ClientProfile?
+  caregiverProfile CaregiverProfile?
+  pets             Pet[]
+
+  sessions Session[]
+  accounts Account[]
+
+  clientBookings   Booking[] @relation("ClientBookings")
+  caregiverBookings Booking[] @relation("CaregiverBookings")
 
   @@map("user")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
+model ClientProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  city  String
+  state String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-  title     String   @db.VarChar(255)
-  content   String?
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-enum Role {
-  USER
-  ADMIN
+model CaregiverProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  bio             String?
+  yearsExperience Int?
+
+  city  String
+  state String
+
+  walkingRate     Float?
+  boardingRate    Float?
+  maxBoardingDogs Int?
+
+  services String[]
+
+  isVerified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Pet {
+  id      String @id @default(uuid())
+  ownerId String
+
+  name   String
+  type   String
+  breed  String?
+  age    Int?
+  weight Float?
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+model ServiceCategory {
+  id   String @id @default(uuid())
+  name String @unique
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+model Booking {
+  id String @id @default(uuid())
+
+  serviceCategoryId String
+  serviceType       String
+
+  status BookingStatus @default(PENDING)
+
+  startTime  DateTime
+  endTime    DateTime
+  totalPrice Float
+  details    Json?
+
+  clientId    String
+  caregiverId String
+
+  client    User @relation("ClientBookings", fields: [clientId], references: [id])
+  caregiver User @relation("CaregiverBookings", fields: [caregiverId], references: [id])
+
+  createdAt DateTime @default(now())
 }
 
 model Session {
@@ -54,7 +129,8 @@ model Session {
   ipAddress String?
   userAgent String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([token])
   @@index([userId])
@@ -66,7 +142,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -76,6 +151,8 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
