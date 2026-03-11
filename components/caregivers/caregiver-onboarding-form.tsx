@@ -66,7 +66,6 @@ export function CaregiverOnboardingForm({ existing }: CaregiverOnboardingFormPro
     }
 
     router.push("/dashboard");
-    router.refresh();
   }
 
   return (

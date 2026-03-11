@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 import {
   clientProfileSchema,
   caregiverProfileSchema,
@@ -22,7 +23,7 @@ export async function getUserProfiles(userId: string) {
 export async function createClientProfile(userId: string, data: ClientProfileFormData) {
   const parsed = clientProfileSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: "Invalid data", fieldErrors: parsed.error.flatten().fieldErrors };
+    return { error: "Invalid data" };
   }
 
   const existing = await prisma.clientProfile.findUnique({ where: { userId } });
@@ -32,13 +33,14 @@ export async function createClientProfile(userId: string, data: ClientProfileFor
     data: { ...parsed.data, userId },
   });
 
+  revalidatePath("/dashboard");
   return { profile };
 }
 
 export async function createCaregiverProfile(userId: string, data: CaregiverProfileFormData) {
   const parsed = caregiverProfileSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: "Invalid data", fieldErrors: parsed.error.flatten().fieldErrors };
+    return { error: "Invalid data" };
   }
 
   const existing = await prisma.caregiverProfile.findUnique({ where: { userId } });
@@ -48,13 +50,15 @@ export async function createCaregiverProfile(userId: string, data: CaregiverProf
     data: { ...parsed.data, userId },
   });
 
+  revalidatePath("/dashboard");
+  revalidatePath("/caregivers");
   return { profile };
 }
 
 export async function updateCaregiverProfile(userId: string, data: CaregiverProfileFormData) {
   const parsed = caregiverProfileSchema.safeParse(data);
   if (!parsed.success) {
-    return { error: "Invalid data", fieldErrors: parsed.error.flatten().fieldErrors };
+    return { error: "Invalid data" };
   }
 
   const profile = await prisma.caregiverProfile.upsert({
@@ -63,5 +67,7 @@ export async function updateCaregiverProfile(userId: string, data: CaregiverProf
     create: { ...parsed.data, userId },
   });
 
+  revalidatePath("/dashboard");
+  revalidatePath("/caregivers");
   return { profile };
 }

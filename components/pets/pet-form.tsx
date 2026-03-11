@@ -55,7 +55,6 @@ export function PetForm({ pet }: PetFormProps) {
     }
 
     router.push("/dashboard/pets");
-    router.refresh();
   }
 
   async function handleDelete() {
@@ -63,7 +62,6 @@ export function PetForm({ pet }: PetFormProps) {
     setIsDeleting(true);
     await deletePet(session.user.id, pet.id);
     router.push("/dashboard/pets");
-    router.refresh();
   }
 
   return (

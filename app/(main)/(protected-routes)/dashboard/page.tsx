@@ -7,8 +7,20 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PawPrint, Briefcase, Search, Plus, ChevronRight } from "lucide-react";
+import { PawPrint, Briefcase, Search, Plus, ChevronRight, Pencil } from "lucide-react";
 import type { Pet } from "@/generated/prisma/client";
+
+const PET_TYPE_EMOJI: Record<string, string> = {
+  dog: "🐕",
+  cat: "🐈",
+  bird: "🐦",
+  rabbit: "🐇",
+  fish: "🐠",
+};
+
+function petEmoji(type: string) {
+  return PET_TYPE_EMOJI[type.toLowerCase()] ?? "🐾";
+}
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -20,88 +32,89 @@ export default async function DashboardPage() {
   ]);
 
   const hasCaregiverProfile = !!userWithProfiles?.caregiverProfile;
+  const firstName = session.user.name?.split(" ")[0];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Welcome back{session.user.name ? `, ${session.user.name}` : ""}!</h1>
-        <p className="text-muted-foreground mt-1">Manage your pets, profile, and discover caregivers.</p>
+      <div className="space-y-1">
+        <h1 className="text-4xl font-extrabold">
+          Welcome back{firstName ? `, ${firstName}` : ""}! 👋
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          Manage your pets, profile, and discover caregivers.
+        </p>
       </div>
 
       {/* Quick Actions */}
       <div className="grid sm:grid-cols-3 gap-4">
-        <Card className="hover:border-primary/50 transition-colors">
-          <Link href="/dashboard/pets">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <PawPrint className="size-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold">My Pets</p>
-                <p className="text-sm text-muted-foreground">
-                  {pets.length} {pets.length === 1 ? "pet" : "pets"} registered
-                </p>
-              </div>
-              <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-            </CardContent>
-          </Link>
-        </Card>
-
-        <Card className="hover:border-primary/50 transition-colors">
-          <Link href={hasCaregiverProfile ? "/onboarding/caregiver" : "/onboarding/caregiver"}>
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <Briefcase className="size-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold">Caregiver Profile</p>
-                <p className="text-sm text-muted-foreground">
-                  {hasCaregiverProfile ? "Manage your profile" : "Become a caregiver"}
-                </p>
-              </div>
-              <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-            </CardContent>
-          </Link>
-        </Card>
-
-        <Card className="hover:border-primary/50 transition-colors">
-          <Link href="/caregivers">
-            <CardContent className="p-6 flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-primary/10">
-                <Search className="size-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold">Find Caregivers</p>
-                <p className="text-sm text-muted-foreground">Browse local caregivers</p>
-              </div>
-              <ChevronRight className="size-4 text-muted-foreground shrink-0" />
-            </CardContent>
-          </Link>
-        </Card>
+        {[
+          {
+            href: "/dashboard/pets",
+            icon: PawPrint,
+            label: "My Pets",
+            sub: `${pets.length} ${pets.length === 1 ? "pet" : "pets"} registered`,
+            iconBg: "bg-orange-500/15",
+            iconColor: "text-orange-500",
+          },
+          {
+            href: "/onboarding/caregiver",
+            icon: Briefcase,
+            label: "Caregiver Profile",
+            sub: hasCaregiverProfile ? "Manage your profile" : "Become a caregiver",
+            iconBg: "bg-amber-500/15",
+            iconColor: "text-amber-500",
+          },
+          {
+            href: "/caregivers",
+            icon: Search,
+            label: "Find Caregivers",
+            sub: "Browse local caregivers",
+            iconBg: "bg-primary/10",
+            iconColor: "text-primary",
+          },
+        ].map((action) => (
+          <Card
+            key={action.href}
+            className="group border-2 border-transparent hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10 transition-all duration-200"
+          >
+            <Link href={action.href}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`p-3 rounded-2xl ${action.iconBg} shrink-0`}>
+                  <action.icon className={`size-5 ${action.iconColor}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-sm">{action.label}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{action.sub}</p>
+                </div>
+                <ChevronRight className="size-4 text-muted-foreground shrink-0 group-hover:translate-x-0.5 transition-transform" />
+              </CardContent>
+            </Link>
+          </Card>
+        ))}
       </div>
 
       {/* Pets Section */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Your Pets</h2>
-          <Button size="sm" asChild>
+          <h2 className="text-xl font-bold">Your Pets</h2>
+          <Button size="sm" className="gap-1.5 shadow-sm shadow-primary/15" asChild>
             <Link href="/dashboard/pets/new">
-              <Plus className="size-4 mr-1" />
+              <Plus className="size-3.5" />
               Add Pet
             </Link>
           </Button>
         </div>
 
         {pets.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center space-y-3">
-              <PawPrint className="size-10 text-muted-foreground mx-auto" />
-              <h3 className="font-semibold">No pets yet</h3>
-              <p className="text-sm text-muted-foreground">
-                Add your first pet to get started with Helply.
+          <Card className="border-2 border-dashed border-primary/20 bg-primary/5">
+            <CardContent className="p-14 text-center space-y-4">
+              <div className="text-5xl">🐾</div>
+              <h3 className="font-bold text-lg">No pets yet</h3>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                Add your first pet so caregivers know who they&apos;ll be looking after.
               </p>
-              <Button asChild>
+              <Button asChild className="shadow-sm shadow-primary/20">
                 <Link href="/dashboard/pets/new">Add your first pet</Link>
               </Button>
             </CardContent>
@@ -109,26 +122,40 @@ export default async function DashboardPage() {
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {pets.map((pet: Pet) => (
-              <Card key={pet.id} className="hover:border-primary/50 transition-colors">
+              <Card
+                key={pet.id}
+                className="group border-2 border-transparent hover:border-primary/40 hover:-translate-y-0.5 hover:shadow-md hover:shadow-primary/10 transition-all duration-200"
+              >
                 <Link href={`/dashboard/pets/${pet.id}`}>
-                  <CardContent className="p-5 space-y-2">
+                  <CardContent className="p-5 space-y-3">
                     <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-semibold">{pet.name}</p>
-                        <p className="text-sm text-muted-foreground capitalize">{pet.type}</p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">{petEmoji(pet.type)}</span>
+                        <div>
+                          <p className="font-bold">{pet.name}</p>
+                          <p className="text-sm text-muted-foreground capitalize">{pet.type}</p>
+                        </div>
                       </div>
+                      <Pencil className="size-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+
+                    <div className="flex flex-wrap gap-1.5">
                       {pet.breed && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs font-semibold">
                           {pet.breed}
                         </Badge>
                       )}
+                      {pet.age != null && (
+                        <Badge variant="muted" className="text-xs">
+                          {pet.age} yr{pet.age !== 1 ? "s" : ""}
+                        </Badge>
+                      )}
+                      {pet.weight != null && (
+                        <Badge variant="muted" className="text-xs">
+                          {pet.weight} lbs
+                        </Badge>
+                      )}
                     </div>
-                    {(pet.age || pet.weight) && (
-                      <div className="flex gap-3 text-xs text-muted-foreground">
-                        {pet.age && <span>{pet.age} yr{pet.age !== 1 ? "s" : ""}</span>}
-                        {pet.weight && <span>{pet.weight} lbs</span>}
-                      </div>
-                    )}
                   </CardContent>
                 </Link>
               </Card>
@@ -137,36 +164,37 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      {/* Caregiver Status */}
+      {/* Caregiver Profile Status */}
       {hasCaregiverProfile && (
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <CardHeader className="pb-3">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <CardTitle>Your Caregiver Profile</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-base font-bold">Your Caregiver Profile</CardTitle>
+                <CardDescription className="mt-0.5">
                   {userWithProfiles.caregiverProfile!.city},{" "}
                   {userWithProfiles.caregiverProfile!.state}
                 </CardDescription>
               </div>
-              <Badge variant={userWithProfiles.caregiverProfile!.isVerified ? "success" : "muted"}>
-                {userWithProfiles.caregiverProfile!.isVerified ? "Verified" : "Pending Review"}
+              <Badge
+                variant={userWithProfiles.caregiverProfile!.isVerified ? "success" : "muted"}
+                className="shrink-0 font-semibold"
+              >
+                {userWithProfiles.caregiverProfile!.isVerified ? "✓ Verified" : "Pending Review"}
               </Badge>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="flex flex-wrap gap-2">
               {userWithProfiles.caregiverProfile!.services.map((s) => (
-                <Badge key={s} variant="secondary">
+                <Badge key={s} variant="secondary" className="font-semibold">
                   {s === "DOG_WALKING" ? "Dog Walking" : "Boarding"}
                 </Badge>
               ))}
             </div>
-            <div className="mt-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/onboarding/caregiver">Edit Profile</Link>
-              </Button>
-            </div>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/onboarding/caregiver">Edit Profile</Link>
+            </Button>
           </CardContent>
         </Card>
       )}
