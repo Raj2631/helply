@@ -7,8 +7,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PawPrint, Briefcase, Search, Plus, ChevronRight, Pencil } from "lucide-react";
+import { PawPrint, Briefcase, Search, Plus, ChevronRight, Pencil, ShieldCheck } from "lucide-react";
 import type { Pet } from "@/generated/prisma/client";
+import prisma from "@/lib/prisma";
 
 const PET_TYPE_EMOJI: Record<string, string> = {
   dog: "🐕",
@@ -26,13 +27,15 @@ export default async function DashboardPage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/sign-in");
 
-  const [userWithProfiles, pets] = await Promise.all([
+  const [userWithProfiles, pets, dbUser] = await Promise.all([
     getUserProfiles(session.user.id),
     getUserPets(session.user.id),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { isAdmin: true } }),
   ]);
 
   const hasCaregiverProfile = !!userWithProfiles?.caregiverProfile;
   const firstName = session.user.name?.split(" ")[0];
+  const isAdmin = dbUser?.isAdmin ?? false;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-12 space-y-10">
@@ -73,6 +76,18 @@ export default async function DashboardPage() {
             iconBg: "bg-primary/10",
             iconColor: "text-primary",
           },
+          ...(isAdmin
+            ? [
+                {
+                  href: "/admin/caregivers",
+                  icon: ShieldCheck,
+                  label: "Review Caregivers",
+                  sub: "Admin — verify applications",
+                  iconBg: "bg-emerald-500/15",
+                  iconColor: "text-emerald-500",
+                },
+              ]
+            : []),
         ].map((action) => (
           <Card
             key={action.href}

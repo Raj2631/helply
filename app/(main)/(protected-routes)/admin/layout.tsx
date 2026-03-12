@@ -1,0 +1,14 @@
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
+
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/sign-in");
+
+  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  if (!user?.isAdmin) redirect("/dashboard");
+
+  return <>{children}</>;
+}
