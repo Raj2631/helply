@@ -41,19 +41,22 @@ const trustFeatures = [
   {
     icon: Shield,
     title: "Verified Caregivers",
-    description: "Every caregiver goes through our trust & safety review before listing.",
+    description:
+      "Every caregiver goes through our trust & safety review before listing.",
     iconClass: "bg-orange-500/10 text-orange-500",
   },
   {
     icon: Star,
     title: "Detailed Profiles",
-    description: "Browse bios, experience, pricing, and location before reaching out.",
+    description:
+      "Browse bios, experience, pricing, and location before reaching out.",
     iconClass: "bg-amber-500/10 text-amber-500",
   },
   {
     icon: Clock,
     title: "Consistent Care",
-    description: "Find caregivers who match your schedule and your pet's personality.",
+    description:
+      "Find caregivers who match your schedule and your pet's personality.",
     iconClass: "bg-orange-400/10 text-orange-400",
   },
   {
@@ -65,9 +68,21 @@ const trustFeatures = [
 ];
 
 const steps = [
-  { step: "01", title: "Browse caregivers", desc: "Filter by city, service type, and availability." },
-  { step: "02", title: "View full profiles", desc: "Read bios, experience, pricing, and reviews." },
-  { step: "03", title: "Book with confidence", desc: "Secure booking with caregiver accountability." },
+  {
+    step: "01",
+    title: "Browse caregivers",
+    desc: "Filter by city, service type, and availability.",
+  },
+  {
+    step: "02",
+    title: "View full profiles",
+    desc: "Read bios, experience, pricing, and reviews.",
+  },
+  {
+    step: "03",
+    title: "Book with confidence",
+    desc: "Secure booking with caregiver accountability.",
+  },
 ];
 
 const stats = [
@@ -117,29 +132,43 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto leading-relaxed">
-            Connect with experienced, verified pet caregivers in your area.
-            Dog walking, boarding — handled by people who truly love animals.
+            Connect with experienced, verified pet caregivers in your area. Dog
+            walking, boarding — handled by people who truly love animals.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <Button size="lg" className="gap-2 text-base px-8 shadow-lg shadow-primary/25" asChild>
+            <Button
+              size="lg"
+              className="gap-2 text-base px-8 shadow-lg shadow-primary/25"
+              asChild
+            >
               <Link href="/caregivers">
                 Find a Caregiver
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-base px-8" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-base px-8"
+              asChild
+            >
               <Link href="/sign-up">Become a Caregiver</Link>
             </Button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-5 pt-1">
-            {["No commitment", "Verified profiles", "Real reviews"].map((label) => (
-              <div key={label} className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                <CheckCircle2 className="size-4 text-primary shrink-0" />
-                {label}
-              </div>
-            ))}
+            {["No commitment", "Verified profiles", "Real reviews"].map(
+              (label) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-1.5 text-sm text-muted-foreground"
+                >
+                  <CheckCircle2 className="size-4 text-primary shrink-0" />
+                  {label}
+                </div>
+              )
+            )}
           </div>
         </div>
       </section>
@@ -159,10 +188,13 @@ export default function HomePage() {
       {/* ── Services ── */}
       <section className="px-4 py-24 max-w-6xl mx-auto w-full">
         <div className="text-center mb-14">
-          <Badge variant="secondary" className="mb-3 font-semibold">Services</Badge>
+          <Badge variant="secondary" className="mb-3 font-semibold">
+            Services
+          </Badge>
           <h2 className="text-4xl font-extrabold">Everything your pet needs</h2>
           <p className="text-muted-foreground mt-3 text-lg max-w-lg mx-auto">
-            Quality care tailored to your schedule and your pet&apos;s personality.
+            Quality care tailored to your schedule and your pet&apos;s
+            personality.
           </p>
         </div>
 
@@ -185,7 +217,9 @@ export default function HomePage() {
                   </Badge>
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{service.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{service.description}</p>
+                <p className="text-muted-foreground leading-relaxed">
+                  {service.description}
+                </p>
                 <div className="mt-6">
                   <Button
                     variant="ghost"
@@ -208,8 +242,12 @@ export default function HomePage() {
       <section className="px-4 py-24 bg-muted/40">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <Badge variant="secondary" className="mb-3 font-semibold">How it works</Badge>
-            <h2 className="text-4xl font-extrabold">Up and running in minutes</h2>
+            <Badge variant="secondary" className="mb-3 font-semibold">
+              How it works
+            </Badge>
+            <h2 className="text-4xl font-extrabold">
+              Up and running in minutes
+            </h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-10 relative">
             {steps.map((s, i) => (
@@ -221,7 +259,9 @@ export default function HomePage() {
                   {s.step}
                 </div>
                 <h3 className="font-bold text-lg">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {s.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -231,7 +271,9 @@ export default function HomePage() {
       {/* ── Why Helply ── */}
       <section className="px-4 py-24 max-w-6xl mx-auto w-full">
         <div className="text-center mb-14">
-          <Badge variant="secondary" className="mb-3 font-semibold">Why Helply</Badge>
+          <Badge variant="secondary" className="mb-3 font-semibold">
+            Why Helply
+          </Badge>
           <h2 className="text-4xl font-extrabold">Built around trust</h2>
           <p className="text-muted-foreground mt-3 text-lg max-w-lg mx-auto">
             We know leaving your pet with someone new is a big deal.
@@ -270,7 +312,8 @@ export default function HomePage() {
               Ready to find the perfect match?
             </h2>
             <p className="text-primary-foreground/75 text-lg max-w-xl mx-auto">
-              Browse profiles, check pricing, and connect with caregivers in your city today.
+              Browse profiles, check pricing, and connect with caregivers in
+              your city today.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Button
@@ -283,7 +326,7 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white/40 text-primary-foreground hover:bg-white/10 px-8"
+                className="border-white/40 text-primary-foreground bg-primary hover:bg-white/10 px-8"
                 asChild
               >
                 <Link href="/sign-up">Create an Account</Link>
